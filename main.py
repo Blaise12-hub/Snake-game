@@ -4,6 +4,7 @@ import time
 import random   
 
 SIZE = 40
+# BACKGROUND_COLOR = (110,110,5)
 
 
 class Apple:
@@ -115,14 +116,15 @@ class Game:
 
     #function to handle playing sounds/music when crash/collision
     def play_sound(self,sound):
-        sound=pygame.mixer.Sound("resources/{sound}.mp3")
+        sound=pygame.mixer.Sound(f"resources/{sound}.mp3")
         pygame.mixer.Sound.play(sound)
-                
-    def render_background(SELF):
+
+    def render_background(self):
         bg= pygame.image.load("resources/background.jpg")
         self.surface.blit(bg, (0,0))
     
     def play(self):
+        self.render_background()
         self.snake.walk()
         self.snake.draw()
         self.apple.draw()
@@ -140,6 +142,16 @@ class Game:
             if self.is_collision(self.snake.x[0],self.snake.y[0],self.snake.x[i],self.snake.y[i]):
                 self.play_sound("crash")
                 raise "Collision occured"
+
+        # Wall collision check inside Game.play()
+        if (
+            self.snake.x[0] < 0
+            or self.snake.x[0] >= 500
+            or self.snake.y[0] < 0
+            or self.snake.y[0] >= 500
+        ):
+            self.play_sound("crash")
+            raise Exception("Hit wall")
                 
     
 
