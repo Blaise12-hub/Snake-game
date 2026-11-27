@@ -81,8 +81,12 @@ class Snake:
 class Game:
     def __init__(self):
         pygame.init()
+        pygame.display.set_caption("Snake Game using pygame library in python")
+
+        pygame.mixer.init()
+        self.play_background_music()
+
         self.surface = pygame.display.set_mode((500,500))
-        # self.surface.fill((110,110,5))
         self.snake=Snake(self.surface, 1)
         self.snake.draw()
         self.apple=Apple(self.surface)
@@ -104,6 +108,20 @@ class Game:
             score = font.render(f"Score: {self.snake.length}",True,(200,200,200))
             self.surface.blit(score,(350,10))
 
+    #play bg music
+    def play_background_music(self):
+        pygame.mixer.music.load("resources/bg_music_1.mp3")
+        pygame.mixer.music.play()
+
+    #function to handle playing sounds/music when crash/collision
+    def play_sound(self,sound):
+        sound=pygame.mixer.Sound("resources/{sound}.mp3")
+        pygame.mixer.Sound.play(sound)
+                
+    def render_background(SELF):
+        bg= pygame.image.load("resources/background.jpg")
+        self.surface.blit(bg, (0,0))
+    
     def play(self):
         self.snake.walk()
         self.snake.draw()
@@ -113,15 +131,17 @@ class Game:
 
         #when snake eat apple
         if self.is_collision(self.snake.x[0],self.snake.y[0],self.apple.x,self.apple.y):
+            self.play_sound("ding")
             self.snake.increase_length()
             self.apple.move()
 
         #snake eating tiself/colliding with itself
         for i in range(2,self.snake.length):
             if self.is_collision(self.snake.x[0],self.snake.y[0],self.snake.x[i],self.snake.y[i]):
+                self.play_sound("crash")
                 raise "Collision occured"
-                # self.show_game_over()
-                # return
+                
+    
 
     def show_game_over(self):
         self.surface.fill((110,110,5))
@@ -132,6 +152,9 @@ class Game:
         self.surface.blit(line2,(100,250))
 
         pygame.display.flip()
+
+        #have to pause whenver game is over
+        pygame.mixer.music.pause()
  
     
 
@@ -146,6 +169,7 @@ class Game:
                             running = False
 
                         if event.key == K_RETURN:
+                            pygame.mixer.music.unpause() #unpause music 
                             if pause:
                                 self.reset()
                                 pause = False
